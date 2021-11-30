@@ -1,113 +1,355 @@
-# RestApi-PHP-JWT
+Phalcon Micro REST API Basic Project Skeleton
+====================
 
-API en PHP para recibir peticiones HTTP (GET,POST,PUT,DELETE) desde cualquier aplicación.
-A modo de ejemplo solo se incluye un objeto en la base de datos. 
+[![Author](http://img.shields.io/badge/author-@davellanedam-blue.svg?style=flat-square)](https://twitter.com/davellanedam)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/davellanedam/phalcon-micro-rest-api-skeleton/blob/master/LICENSE)
+[![Release](https://img.shields.io/github/release/davellanedam/phalcon-micro-rest-api-skeleton.svg?style=flat-square)](https://github.com/davellanedam/phalcon-micro-rest-api-skeleton/releases)
 
-- GET Devuelve los datos en JSON.
-- POST,PUT,DELETE devuelven el identificador del objeto insertado, modificado o eliminado.
-- Permite subir imagenes, se almacenan en el servidor y se devuelven como texto base 64.
-- Uso de controladores y DAO, para separar el control del acceso a los datos.
-- Uso de PDO (PHP) para usar consultas parametrizadas y aumentar la seguridad de la la base de datos a la que accede la RestApi.
-- Permite peticiones GET y POST con el método sobrecargado, debido a que la mayoria de hosting gratuitos sólo permiten peticiones GET y POST.
-- Uso una implementación de JWT (JSON Web Token) para generar un token cuando el usuario inicia sesión, este token será enviado al usuario y lo reenviará en cada petición, de esta forma podemos saber que usuario ha realizado cada petición. 
-En la página jwt.io podemos encontrar varias implementaciones para diferentes lenguajes, he usado la implementación PHP creada por Brent Shaffer (https://github.com/bshaffer), en concreto: https://github.com/firebase/php-jwt
+Getting started
+--------
 
-- Para editar un objeto uso la petición PUT, pero para subir imagenes al servidor hay que hacerlo con POST, por lo tanto para editar imagenes realizo una petición POST con el campo "imagenesPUT" para saber que en realidad estoy editando.
+This is a basic API REST skeleton written on the **ultra hyper mega fastest framework for PHP [phalcon](https://github.com/phalcon/cphalcon)**. A full-stack PHP framework delivered as a C-extension. Its innovative architecture makes Phalcon the fastest PHP framework ever built!
 
+This project is created to help other developers create a **basic REST API in an easy way with phalcon**. This basic example shows how powerful and simple phalcon can be. Do you want to contribute? Pull requests are always welcome to show more features of phalcon.
 
+Features
+--------
 
-## Comenzando 🚀
+* JWT Tokens, provide login with `Authorization` header with value `Basic username:password` where `username:password` **MUST BE ENCODED** with `Base64`.
+* Make requests with a token after login with `Authorization` header with value `Bearer yourToken` where `yourToken` is the **signed and encrypted token** given in the response from the login process.
+* Use ACL so you can have roles for users.
+* Timezone ready: Work UTC time (GMT+0). Responses with iso8601 date/time format.
+* Pagination ready.
+* Filters (JSON).
+* Easy deploy to staging and production environments with rsync.
+* Internationalization ready. API responses use JSON format to make life easier at the frontend.
+* Separate database for logs.
+* User profile.
+* Users list.
+* Cities. (Example of use: call cities API, then send name of the city when creating or updating a user.
+* Integrated tests
 
-Instrucciones para obtener una copia del proyecto en funcionamento en tu máquina local. 
-Mira **Deployment** para conocer como desplegar el proyecto.
+Requirements
+------------
 
+* Apache **2**
+* PHP **5.6+**
+* Phalcon **3.2+**
+* MySQL **5.5+**
 
-### Pre-requisitos 📋
+How to install
+--------------
 
-Un servidor web local como XAMPP o instalar por tu cuenta: 
-Apache 2.4.41, MariaDB 10.4.6, PHP 7.1.32, phpMyAdmin 4.9.0.1, OpenSSL 1.0.2.
-(https://www.apachefriends.org/es/download.html)
+### Using Git (recommended)
 
-Puedes realizar peticiones Get escribiendo directamente en la ruta del navegador,
-o instalar una extensión para Chrome como POSTMAN (https://www.getpostman.com/) para realizar peticiones HTTP.
-Obviamente, también puedes realizar las peticiones directamente desde la aplicación/es que usarán ésta RestApi.
-Por ejemplo, desde una aplicación web puedes usar peticiones ajax usando JQuery, o desde una aplicación móvil Android
-puedes usar la librería Loopj.
+1. First you need to [install composer](https://getcomposer.org/download/) if you haven´t already.
+2. Clone the project from github. Change 'myproject' to you project name.
+```bash
+git clone https://github.com/davellanedam/phalcon-micro-api.git ./myproject
+```
 
-La implementación de JWT (https://github.com/firebase/php-jwt).
+### Using manual download ZIP
 
+1. Download repository
+2. Uncompress to your desired directory
 
-### Instalación 🔧
+### Install composer dependencies after installing (Git or manual download)
 
-Una vez descargado el proyecto:
--Arranca los servicios de Apache y MySQL/MariaDB desde el panel de Control de Xampp.
+```bash
+cd myproject
+composer install
+composer update
+```
+### Database Configuration and Security
 
-- Crea la base de datos, ejecutando el script "backup.sql" en phpmyadmin.
-Como verás hemos creado un usuario con una clave ya codificada, para poder usar la RestApi y crear nuevos usuarios y/u otros objetos.
-El usuario creado es admin y su clave es admin.
-Esto lo hago así, ya que la RestAPi solo recibe peticiones de un usuario que se haya identificado previamente (para protegerla de peticiones externas), por lo que no se pueden crear usuarios (realizando peticiones http) sin antes habernos identificado.
+There are 3 files in the `/myproject/config` directory, (development, staging and production) each one is meant to be used on different environments to make your life easier on deployment.
 
--Edita el archivo Database/database.php
-Escribe tu servidor, base de datos, usuario y contraseña.
-$this->pdo = new PDO('mysql:host=SERVIDOR;dbname=NOMBRE_BASE_DATOS;charset=utf8', 'USUARIO_BASE_DATOS', 'CONTRASEÑA');
+1. Create a MySQL database with your custom name and then import `myproject.sql` (in the `/schemas` directory)
+2. Create a second MySQL database with your custom name and then import `myproject_log.sql` (in the `/schemas` directory).
+3. Open `/myproject/config/server.development.php` and setup your DEVELOPMENT (local) database connection credentials
+4. Open `/myproject/config/server.staging.php` and setup your STAGING (testing server) database connection credentials
+5. Open `/myproject/config/server.production.php` and setup your PRODUCTION (production server) database connection credentials
 
--Edita el archivo inc/token.php, en la línea: 
-define('SERVER', "RUTA_SERVIDOR");
-escribir la ruta del servidor (http://localhost 0 https://webhosting.subdominio.com)
+This is the structure of those 3 files, remember to change values for yours.
+```php
+return [
+    'database' => [
+        'adapter' => 'Mysql', /* Possible Values: Mysql, Postgres, Sqlite */
+        'host' => 'your_ip_or_hostname',
+        'username' => 'your_db_username',
+        'password' => 'your_db_password',
+        'dbname' => 'your_database_schema',
+        'charset' => 'utf8',
+    ],
+    'log_database' => [
+        'adapter' => 'Mysql', /* Possible Values: Mysql, Postgres, Sqlite */
+        'host' => 'your_ip_or_hostname',
+        'username' => 'your_db_username',
+        'password' => 'your_db_password',
+        'dbname' => 'myproject_log',
+        'charset' => 'utf8',
+    ],
+    'authentication' => [
+        'secret' => 'your secret key to SIGN token', // This will sign the token. (still insecure)
+        'encryption_key' => 'Your ultra secret key to ENCRYPT the token', // Secure token with an ultra password
+        'expiration_time' => 86400 * 7, // One week till token expires
+        'iss' => 'myproject', // Token issuer eg. www.myproject.com
+        'aud' => 'myproject', // Token audience eg. www.myproject.com
+    ]
+];
+```
 
-- Descargar el proyecto php-jwt y copialo en tu htdocs/public_html.
+### Setting up environments
+The ENV variable is set on an .htaccess file located at `/public/.htaccess` that you must upload **once** to each server you use. Change the environment variable on each server to what you need. To make your life easy this .htaccess file is on the **excluded files list to upload** when you make a deploy. Possible values are: `development`, `staging` and `production`.
+```bash
+############################################################
+# Possible values: development, staging, production        #
+# Change value and upload ONCE to your server              #
+# AVOID re-uploading when deployment, things will go crazy #
+############################################################
+SetEnv APPLICATION_ENV "development"
+```
 
-## Ejecutando las pruebas ⚙️
+Usage
+--------------
 
-Para realizar una petición sencilla y obtener el resultado, podemos escrbir en el navegador 
-localhost/restapi/v1/profesor/admin y veremos el resultado: 
-{"error":"401","mensaje":"El token no es válido, vuelve a iniciar sesión."}
+Once everything is set up to test API routes either use Postman or any other api testing application. Remember to change the URL of the **provided example Postman JSON file**. Default username/password combination for login is `admin/admin1234`.
 
-Iniciar Sesión usando POSTMAN
-![alt text](https://raw.githubusercontent.com/RubensSoft/RestApi-PHP-JWT/master/imagenesReadme/post%20inicio%20sesion.png)
+If you use Postman please go to `manage environments` and then create one for each of your servers. Create a new key `authToken` with `token` value (the token you got from the login process), each time you make a request to the API it will send `Authorization` header with the token value in the request, you can check this on the headers of users or cities endpoints in the Postman example.
 
-Realizar una petición con el token recibido
-![alt text](https://raw.githubusercontent.com/RubensSoft/RestApi-PHP-JWT/master/imagenesReadme/peticion%20get%20enviando%20token.png)
+This is a REST API, so it works using the following HTTP methods:
 
+* GET (Read): Gets a list of items, or a single item
+* POST (Create): Creates an item
+* PATCH (Update): Updates an item
+* DELETE: Deletes an item
 
+### Testing
+There are some tests included, to run tests you need to go to the command line and type:
+```bash
+composer test
+```
 
-## Deployment 📦
+### Creating new models
+If you need to add more models to the project there´s an easy way to do it with `phalcondevtools` (If you did `composer install`, you already have this).
+Step into a terminal window and open your project folder, then type the following and you are set!
+```bash
+phalcon model --name=your_table_name --schema=your_database --mapcolumn
+```
 
-Para desplegar este proyecto, podemos subirlo a un hosting y usarlo desde ahí en lugar de en local.
-Debemos crear la base de datos en el hosting y, al igual que en local, cambiar en el archivo database.php los datos del servidor, nombre de la base de datos, usuario y clave.
-Normalmente, el hoting nos crea un usuario ftp para subir los archivos al servidor.
-Una vez subido podemos usar de nuevo POTMAN.
-Hay que recordar que muchos hosting solo permiten peticiones GET y POST, pero podemos sobrecargar estos métodos. 
+### Creating new controllers
+If you need to add more controllers to the project there´s an easy way to do it with `phalcondevtools` (If you did `composer install`, you already have this).
+Step into a terminal window and open your project folder, then type the following.
+```bash
+phalcon controller --name=your_controller_name_without_the_controller_word
+```
+When it´s done, it creates your new controller, but if you want to use `ControllerBase.php` functions in your newly created controller you must change the following line in the new controller:
+```php
+class MyNewController extends \Phalcon\Mvc\Controller
+```
+to this:
+```php
+class MyNewController extends ControllerBase
+```
 
+### Creating new routes
+You can add more routes to your project by adding them into the `/app.php` file. This is an example of `/users` routes:
+```php
+/**
+* Users
+*/
+$users = new MicroCollection();
+$users->setHandler('UsersController', true);
+$users->setPrefix('/users');
+// Gets all users
+$users->get('/', 'index');
+// Creates a new user
+$users->post('/create', 'create');
+// Gets user based on unique key
+$users->get('/get/{id}', 'get');
+// Updates user based on unique key
+$users->patch('/update/{id}', 'update');
+// Changes user password
+$users->patch('/change-password/{id}', 'changePassword');
+// Adds users routes to $app
+$app->mount($users);
+```
 
-## Construido con 🛠️
+Remember to add the controller (without the controller word) and methods of endpoints to the `/config/acl.php`file. Otherwise you will get this response from the API: `'common.YOUR_USER_ROLE_DOES_NOT_HAVE_THIS_FEATURE',`
+```php
+/*
+ * RESOURCES
+ * for each user, specify the 'controller' and 'method' they have access to ('user_type'=>['controller'=>['method','method','...']],...)
+ * */
+$arrResources = [
+    'Guest'=>[
+        'Users'=>['login'],
+    ],
+    'User'=>[
+        'Profile'=>['index','update','changePassword'],
+        'Users'=>['index','create','get','search','update','logout'],
+        'Cities'=>['index','create','get','ajax','update','delete'],
+    ],
+    'Superuser'=>[
+        'Users'=>['changePassword'],
+    ]
+];
+```
 
-* PHP usando PDO y DAO
-* SQL
+Always keep in mind the following:
+```php
+/*
+ * ROLES
+ * Superuser - can do anything (Guest, User, and own things)
+ * User - can do most things (Guest and own things)
+ * Guest - Public
+ * */
+ ```
 
+Internationalization
+-------
+API is designed to response with a JSON, so at the FRONTEND you can use lang files like this:
+Put your language files in 'langs' directory at frontend:
 
-## Contribuyendo 🖇️
-## Wiki 📖
-## Versionado 📌
+* `langs`
+    * `en.json`
+    * `es.json`
 
+Example of language file `en.json` :
 
-## Autores ✒️
+```json
+{
+    "common" : {
+        "HEADER_AUTHORIZATION_NOT_SENT": "Header Authorization not sent",
+        "EMPTY_TOKEN_OR_NOT_RECEIVED": "Empty token or not received",
+        "YOUR_USER_ROLE_DOES_NOT_HAVE_THIS_FEATURE": "Your user role does not have this feature",
+        "BAD_TOKEN_GET_A_NEW_ONE": "Bad token, get a new one",
+        "SUCCESSFUL_REQUEST": "Succesfull request",
+        "CREATED_SUCCESSFULLY": "Created successfully",
+        "THERE_IS_ALREADY_A_RECORD_WITH_THAT_NAME": "There is already a record with that name",
+        "UPDATED_SUCCESSFULLY": "Updated successfully",
+        "DELETED_SUCCESSFULLY": "Deleted successfully",
+        "THERE_HAS_BEEN_AN_ERROR": "There has been an error",
+        "INCOMPLETE_DATA_RECEIVED": "Incomplete data received",
+        "NO_RECORDS": "No records",
+        "COULD_NOT_BE_CREATED": "Could not be created",
+        "NOT_FOUND": "Not found",
+        "COULD_NOT_BE_DELETED": "Could not be deleted",
+        "COULD_NOT_BE_UPDATED": "Could not be updated"
+    },
+    "login" : {
+        "USER_IS_NOT_REGISTERED": "User is not registered",
+        "USER_BLOCKED": "User blocked",
+        "USER_UNAUTHORIZED": "User unauthorized",
+        "WRONG_USER_PASSWORD": "Wrong user password",
+        "TOO_MANY_FAILED_LOGIN_ATTEMPTS": "Too many failed login attempts"
+    },
+    "profile" : {
+        "PROFILE_NOT_FOUND": "Profile not found",
+        "PROFILE_UPDATED": "Profile updated",
+        "PROFILE_COULD_NOT_BE_UPDATED": "Profile could not be updated",
+        "ANOTHER_USER_ALREADY_REGISTERED_WITH_THIS_USERNAME": "Another user already registered with this username"
+    },
+    "change-password" : {
+        "PASSWORD_COULD_NOT_BE_UPDATED": "Password could not be updated",
+        "PASSWORD_SUCCESSFULLY_UPDATED": "Password updated successfully",
+        "WRONG_CURRENT_PASSWORD": "Wrong current password"
+    }
+}
+```
 
-* **José Rubén Castro Soriano** - *Trabajo Inicial* - [RubensSoft](https://github.com/RubensSoft)
+Example of language file `es.json` :
 
-También puedes mirar la lista de todos los [contribuyentes](https://github.com/RestApi-PHP-JWT/contributors) quíenes han participado en este proyecto. 
+```json
+{
+    "common": {
+        "HEADER_AUTHORIZATION_NOT_SENT": "Autorización de encabezado no enviada",
+        "EMPTY_TOKEN_OR_NOT_RECEIVED": "Token vacío o no recibido",
+        "YOUR_USER_ROLE_DOES_NOT_HAVE_THIS_FEATURE": "Su rol de usuario no tiene esta característica",
+        "BAD_TOKEN_GET_A_NEW_ONE": "Token incorrecto, solicite uno nuevo",
+        "SUCCESSFUL_REQUEST": "Solicitud exitosa",
+        "THERE_IS_ALREADY_A_RECORD_WITH_THAT_NAME": "Ya existe un registro con ese nombre",
+        "THERE_HAS_BEEN_AN_ERROR": "Ocurrió un error",
+        "INCOMPLETE_DATA_RECEIVED": "Los datos recibidos están incompletos",
+        "NO_RECORDS": "No hay registros",
+        "NOT_FOUND": "No encontrado",
+        "CREATED_SUCCESSFULLY": "Creado con éxito",
+        "DELETED_SUCCESSFULLY": "Eliminado con éxito",
+        "UPDATED_SUCCESSFULLY": "Actualizado con éxito",
+        "COULD_NOT_BE_CREATED": "No se pudo crear",
+        "COULD_NOT_BE_DELETED": "No se pudo eliminar",
+        "COULD_NOT_BE_UPDATED": "No se pudo actualizar"
+    },
+    "login": {
+        "USER_IS_NOT_REGISTERED": "El usuario no está registrado",
+        "USER_BLOCKED": "Usuario bloqueado",
+        "USER_UNAUTHORIZED": "Usuario no autorizado",
+        "WRONG_USER_PASSWORD": "Contraseña de usuario incorrecta",
+        "TOO_MANY_FAILED_LOGIN_ATTEMPTS": "Demasiados intentos fallidos de inicio de sesión"
+    },
+    "profile": {
+        "PROFILE_NOT_FOUND": "Perfil no encontrado",
+        "PROFILE_UPDATED": "Perfil actualizado correctamente",
+        "PROFILE_COULD_NOT_BE_UPDATED": "No se pudo actualizar el perfil",
+        "ANOTHER_USER_ALREADY_REGISTERED_WITH_THIS_USERNAME": "Otro usuario ya se ha registrado con este nombre de usuario"
+    },
+    "change-password": {
+        "PASSWORD_COULD_NOT_BE_UPDATED": "No se pudo actualizar la contraseña",
+        "PASSWORD_SUCCESSFULLY_UPDATED": "Contraseña actualizada exitosamente",
+        "WRONG_CURRENT_PASSWORD": "La contraseña actual es incorrecta"
+    }
+}
+```
 
-## Licencia 📄
+Deployment
+-------
+You can make a deploy to staging or production servers. It will run a bash file with `rsync` command to sync your project directory to the servers project directory. Step into a terminal window and open your project folder, then type the following.
 
-Este proyecto está bajo la Licencia GNU (General Public License) - mira el archivo [LICENSE.md](LICENSE.md) para detalles.
+### Deploy to staging server
+```bash
+deploy-staging.sh
+```
 
-## Expresiones de Gratitud 🎁
+### Deploy to production server
+```bash
+deploy-production.sh
+```
+### Do not forget to change variables to yours on each .sh file
+```bash
+PROJECT=myproject
+USER=server_username
+URL=my_staging_server_url
+```
 
-* Gracias a Brent Shaffer (https://github.com/bshaffer)
-por su implementación JWT en PHP (https://github.com/firebase/php-jwt).
+### Excluding files on deploy
+You can exclude files on each deployment environment (`/exclude-production.txt` and `/exclude-staging.txt`), add files you want to be excluded on the corresponding .txt file. Each excluded file or directory must be on a new line. Staging exclusion list example:
 
+```txt
+.git/
+*.DS_Store
+.phalcon/
+.php/
+cache/
+.htaccess
+exclude-staging.txt
+exclude-production.txt
+deploy-staging.sh
+deploy-production.sh
+config/server.development.php
+config/server.production.php
+public/.htaccess
+schemas/
+```
 
+Bugs or improvements
+-------
+Feel free to report any bugs or improvements. Pull requests are always welcome.
 
+I love this! How can I help?
+-------
+It´s amazing you feel like that! Send me a tweet https://twitter.com/davellanedam, share this with others, make a pull request or if you feel really thankful you can always buy me a beer! Enjoy!
 
+License
+-------
 
-
+This project is open-sourced software licensed under the MIT License. See the LICENSE file for more information.
