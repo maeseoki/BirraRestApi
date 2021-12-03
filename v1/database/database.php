@@ -4,7 +4,7 @@
  * 
  * @since 1.0.0
  */
-class Database{
+class Database {
 
 	private $dotenv;
     private $db_host;
@@ -19,10 +19,10 @@ class Database{
 		$this->dotenv = Dotenv\Dotenv::createImmutable('..');
 		$this->dotenv->load();
 
-		$this->db_host = $_ENV['DB_HOST'];
-		$this->db_port = $_ENV['DB_PORT'];
-		$this->db_name = $_ENV['DB_NAME'];
-		$this->db_user = $_ENV['DB_USER'];
+		$this->db_host     = $_ENV['DB_HOST'];
+		$this->db_port     = $_ENV['DB_PORT'];
+		$this->db_name     = $_ENV['DB_NAME'];
+		$this->db_user     = $_ENV['DB_USER'];
 		$this->db_password = $_ENV['DB_PASSWORD'];
 	}
 
@@ -39,4 +39,3 @@ class Database{
         return $this->connection;
     }
 }
-?>
