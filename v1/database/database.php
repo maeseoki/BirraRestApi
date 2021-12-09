@@ -1,4 +1,8 @@
 <?php
+
+namespace V1\database;
+use Dotenv\Dotenv;
+
 /**
  * Class used to get the MariaDB/MySQL database connection
  * 
@@ -16,7 +20,7 @@ class Database {
 
 	public function __construct()
 	{
-		$this->dotenv = Dotenv\Dotenv::createImmutable('..');
+		$this->dotenv = Dotenv::createImmutable('..');
 		$this->dotenv->load();
 
 		$this->db_host     = $_ENV['DB_HOST'];
@@ -26,13 +30,19 @@ class Database {
 		$this->db_password = $_ENV['DB_PASSWORD'];
 	}
 
+    /**
+     * Get connection to database.
+     * 
+     * @return PDO
+     * @throws PDOException
+     */
     public function getConnection(){
 
         $this->connection = null;
 
         try{
-            $this->connection = new PDO( "mysql:host=" . $this->db_host . ";port=" . $this->db_port . ";dbname=" . $this->db_name, $this->db_user, $this->db_password );
-        }catch( PDOException $exception ){
+            $this->connection = new \PDO( "mysql:host=" . $this->db_host . ";port=" . $this->db_port . ";dbname=" . $this->db_name, $this->db_user, $this->db_password );
+        }catch( \PDOException $exception ){
             echo "Fallo en la connexión: " . $exception->getMessage();
         }
 
