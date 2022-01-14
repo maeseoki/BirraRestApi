@@ -85,8 +85,12 @@ class Register {
 
 		if ( $stmt->fetch() ) {
 			http_response_code( 400 );
-			echo json_encode( array(
-				'message' => 'El usuario ya existe.' ) );
+			echo json_encode(
+				array(
+					'message' => 'El usuario ya existe.',
+					'errorCode'   => 3
+				)
+			);
 		} else {
 			return true;
 		}

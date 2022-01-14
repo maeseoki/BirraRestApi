@@ -11,14 +11,26 @@
  * /v1/beers/update UPDATE
  */
 require_once( '../vendor/autoload.php' );
-use V1\model\Register;
+use V1\controller\RegisterController;
 
+/**
+ * Extract routes to the api.
+ */
 $path =  $_SERVER['REQUEST_URI'];
 $routes = preg_split('#/#', $path, -1, PREG_SPLIT_NO_EMPTY);
 
+/**
+ * Initialize controllers depending on route.
+ */
 switch ( $routes[2] ) {
 	case 'register':
-		registerUser();
+		try {
+			new RegisterController;
+		} catch (\Throwable $th) {
+			http_response_code( 500 );
+			throw $th;
+			exit;
+		}
 		break;
 	case 'login':
 		login();
@@ -26,18 +38,6 @@ switch ( $routes[2] ) {
 	default:
 		throw new Exception( "Error de llamada a la API" );
 		break;
-}
-
-function registerUser() {
-	$data = json_decode(file_get_contents("php://input"));
-	//var_dump($data);
-	$firstName = $data->user_name;
-	$email = $data->email;
-	$password = $data->password;
-	$rol = $data->rol;
-
-	$register = new Register( $firstName, $email, $password, $rol );
-	$register->registerUser();
 }
 
 function login() {
